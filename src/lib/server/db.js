@@ -13,7 +13,7 @@ if (!building) {
       sql = new SQL({
         url: process.env.DATABASE_URL,
         // ssl: true
-        ssl: { rejectUnauthorized: false }
+        // ssl: { rejectUnauthorized: false }
       });
     } else {
       console.warn("⚠️ Bun runtime not detected (Likely running in an isolated build tool).");
