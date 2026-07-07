@@ -1,4 +1,20 @@
+import { sql } from '$lib/server/db';
 import { TELEGRAM_BOT_TOKEN, PRODUCTION_URL } from '$env/static/private';
+
+// This only runs at true application launch, not during compilation
+if (sql) {
+  try {
+    await sql`
+      CREATE TABLE IF NOT EXISTS telegram_sessions (
+        key VARCHAR(255) PRIMARY KEY,
+        value TEXT NOT NULL
+      )
+    `;
+    console.log("✅ Tables validated dynamically at runtime.");
+  } catch (err) {
+    console.error("❌ Failed to initiate table:", err);
+  }
+}
 
 // Flag to track execution state across function cycles
 let isWebhookRegistered = false;

@@ -1,24 +1,25 @@
-import { SQL } from "bun";
 import { building } from '$app/environment';
 
+let sql = null;
 
-let sql;
-// During the build, we don't want to connect to the database
-// because it may not be available. So we just export a dummy object. 
+// Only evaluate when the application is running live
 if (!building) {
-  // Initialize Bun's native universal SQL driver
-  sql = new SQL({
-    url: process.env.DATABASE_URL,
-    ssl: true // Neon requires SSL
-  });
-  
-  // Create the sessions tracking table if it doesn't exist yet
-  await sql`
-    CREATE TABLE IF NOT EXISTS telegram_sessions (
-      key VARCHAR(255) PRIMARY KEY,
-      value TEXT NOT NULL
-    )
-  `;
+  try {
+    // 1. Check if the native Bun global object exists
+    if (typeof Bun !== 'undefined') {
+      // 2. Safely import the native module dynamically without Node seeing it
+      const { SQL } = await import('bun');
+      
+      sql = new SQL({
+        url: process.env.DATABASE_URL,
+        ssl: true
+      });
+    } else {
+      console.warn("⚠️ Bun runtime not detected (Likely running in an isolated build tool).");
+    }
+  } catch (error) {
+    console.error("❌ Failed to initialize Bun SQL driver:", error);
+  }
 }
 
 export { sql };
