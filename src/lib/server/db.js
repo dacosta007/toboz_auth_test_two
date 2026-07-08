@@ -12,7 +12,7 @@ if (!building) {
       
       sql = new SQL({
         url: process.env.DATABASE_URL,
-        // ssl: true
+        ssl: true
         // ssl: { rejectUnauthorized: false }
       });
     } else {
